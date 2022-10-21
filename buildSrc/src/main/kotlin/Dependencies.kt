@@ -6,6 +6,7 @@ object Dependencies {
     const val junit = "junit:junit:${Versions.junit}"
     const val coreKtx = "androidx.core:core-ktx:${Versions.coreKtx}"
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
+    const val material = "com.google.android.material:material:${Versions.material}"
 
     object Kotlin {
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
