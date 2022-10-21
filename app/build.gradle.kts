@@ -14,4 +14,5 @@ androidAppConfig {
 dependencies {
     implementation(Dependencies.activity)
     implementation(Dependencies.appCompat)
+    implementation(Dependencies.material)
 }

@@ -9,5 +9,6 @@ object Versions {
     const val coroutines = "1.6.4"
     const val lifecycle = "2.4.0-alpha01"
     const val timber = "4.7.1"
+    const val material = "1.4.0-alpha01"
 
 }

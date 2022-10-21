@@ -5,4 +5,6 @@ plugins {
 
 androidLibraryConfig()
 
-dependencies {}
+dependencies {
+    implementation(Dependencies.Kotlin.coroutines)
+}
