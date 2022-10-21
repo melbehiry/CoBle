@@ -12,7 +12,9 @@ androidAppConfig {
 }
 
 dependencies {
+    implementation(project(":coBle"))
     implementation(Dependencies.activity)
     implementation(Dependencies.appCompat)
     implementation(Dependencies.material)
+    implementation(Dependencies.constraintlayout)
 }

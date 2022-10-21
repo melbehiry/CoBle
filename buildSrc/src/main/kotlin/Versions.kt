@@ -10,5 +10,6 @@ object Versions {
     const val lifecycle = "2.4.0-alpha01"
     const val timber = "4.7.1"
     const val material = "1.4.0-alpha01"
+    const val constraintlayout = "2.1.4"
 
 }
