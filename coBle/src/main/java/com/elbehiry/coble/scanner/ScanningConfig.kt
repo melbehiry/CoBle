@@ -2,49 +2,44 @@ package com.elbehiry.coble.scanner
 
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
-import android.os.ParcelUuid
-import com.elbehiry.coble.BluetoothIdentifiers
+import java.util.regex.Pattern
 
-fun ScanningConfig.Companion.create(
-    bluetoothIdentifiers: BluetoothIdentifiers
-): ScanningConfig = DefaultScanningConfig(
-    bluetoothIdentifiers = bluetoothIdentifiers
-)
+@DslMarker
+annotation class ScanningConfigDsl
 
-interface ScanningConfig {
-    val filters: List<ScanFilter>?
-    val scanSettings: ScanSettings
+@ScanningConfigDsl
+inline fun createScanningConfig(block: ScanningConfig.Builder.() -> Unit): ScanningConfig =
+    ScanningConfig.Builder().apply(block).build()
 
-    companion object
-}
+class ScanningConfig private constructor(builder: Builder)  {
 
-private class DefaultScanningConfig(
-    bluetoothIdentifiers: BluetoothIdentifiers
-) : ScanningConfig {
+    val namePatterns: List<Pattern> = builder.namePatterns
 
-    private val filtersList = mutableListOf<ScanFilter>()
+    val scanFilters: List<ScanFilter> = builder.scanFilters
 
-    init {
-        bluetoothIdentifiers.serviceUUID?.let { uuid->
-            filtersList.add(
-                ScanFilter.Builder().setServiceUuid(ParcelUuid(uuid)).build()
-            )
+    val scanSettings: ScanSettings = builder.scanSettings
+
+    @ScanningConfigDsl
+    class Builder {
+
+        var scanSettings: ScanSettings = ScanSettings.Builder().build()
+
+        var scanFilters: List<ScanFilter> = emptyList()
+
+        var namePatterns: List<Pattern> = emptyList()
+
+        fun setScanSetting(settings: ScanSettings) = apply {
+            scanSettings = settings
         }
 
-        bluetoothIdentifiers.deviceAddress?.let {  address->
-            filtersList.add(
-                ScanFilter.Builder().setDeviceAddress(address).build()
-            )
+        fun setScanFilters(filters: List<ScanFilter>) = apply {
+            scanFilters = filters
         }
 
-        bluetoothIdentifiers.deviceName?.let { deviceName ->
-            filtersList.add(
-                ScanFilter.Builder().setDeviceName(deviceName).build()
-            )
+        fun setNamePatterns(nameRegexPatterns: List<Pattern>) = apply {
+            namePatterns = nameRegexPatterns
         }
+
+        fun build(): ScanningConfig = ScanningConfig(this)
     }
-
-    override val filters: List<ScanFilter> = filtersList
-
-    override val scanSettings: ScanSettings = ScanSettings.Builder().build()
 }

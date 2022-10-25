@@ -1,4 +1,4 @@
-package com.elbehiry.coble
+package com.elbehiry.coble.bluetooth
 
 import android.bluetooth.le.AdvertiseCallback
 import kotlin.time.Duration
