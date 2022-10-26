@@ -1,4 +1,4 @@
-package com.elbehiry.coble
+package com.elbehiry.coble.extensions
 
 internal fun <T> requireBle(t: T): T {
     return requireNotNull(t) {

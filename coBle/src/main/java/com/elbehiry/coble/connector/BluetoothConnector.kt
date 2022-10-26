@@ -11,15 +11,16 @@ import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
+import com.elbehiry.coble.LoggingTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
-import timber.log.Timber
 import java.util.UUID
 
 private const val DEFAULT_GATT_TIMEOUT = 5000L
@@ -27,13 +28,13 @@ private val ClientCharacteristicConfigurationID =
     UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
 
-internal fun BluetoothConnector.Companion.create(): BluetoothConnector =
-    AndroidBluetoothConnector()
+internal fun BluetoothConnector.Companion.create(context: Context): BluetoothConnector =
+    AndroidBluetoothConnector(context= context)
 
 
 interface BluetoothConnector {
 
-    suspend fun connect(context: Context, device: BluetoothDevice): ConnectionStateChanged
+    suspend fun connect(device: BluetoothDevice): ConnectionStateChanged
     suspend fun registerNotifications(
         characteristic: BluetoothGattCharacteristic,
         clientCharacteristicConfigurationID: UUID = ClientCharacteristicConfigurationID
@@ -52,7 +53,7 @@ interface BluetoothConnector {
     companion object
 }
 
-private class AndroidBluetoothConnector : BluetoothConnector {
+private class AndroidBluetoothConnector (val context: Context) : BluetoothConnector {
 
     private val gattCallback = GattCallback()
     private val mutex = Mutex()
@@ -65,23 +66,21 @@ private class AndroidBluetoothConnector : BluetoothConnector {
 
     @RequiresPermission(anyOf = [BLUETOOTH, BLUETOOTH_CONNECT])
     override suspend fun connect(
-        context: Context,
         device: BluetoothDevice
     ): ConnectionStateChanged =
         mutex.queueWithTimeout("connect") {
             if (bluetoothGatt != null) {
-                Timber.d("reconnecting...")
-                reconnect(context, device)
+                Log.d(LoggingTag, "reconnecting...")
+                reconnect(device)
             } else {
-                Timber.d("new connection")
-                connectDevice(device, context)
+                Log.d(LoggingTag, "new connection")
+                connectDevice(device)
             }
         }
 
     @RequiresPermission(anyOf = [BLUETOOTH, BLUETOOTH_CONNECT])
     private suspend fun connectDevice(
-        device: BluetoothDevice,
-        context: Context
+        device: BluetoothDevice
     ): ConnectionStateChanged {
         val connectionStateChanged = events.onSubscription {
             bluetoothGatt = device.connectGatt(
@@ -98,14 +97,13 @@ private class AndroidBluetoothConnector : BluetoothConnector {
                 BluetoothGatt.GATT_FAILURE,
                 BluetoothProfile.STATE_DISCONNECTED
             )
-        Timber.d(connectionStateChanged.toString())
+        Log.d(LoggingTag, connectionStateChanged.toString())
 
         return connectionStateChanged
     }
 
     @RequiresPermission(anyOf = [BLUETOOTH, BLUETOOTH_CONNECT])
     private suspend fun reconnect(
-        context: Context,
         device: BluetoothDevice
     ): ConnectionStateChanged {
         val bluetoothManager = context.getSystemService(BluetoothManager::class.java)
@@ -144,7 +142,11 @@ private class AndroidBluetoothConnector : BluetoothConnector {
                                 .onSubscription {
                                     val descriptorWrittenResult =
                                         requireGatt().writeDescriptor(descriptor)
-                                    Timber.d("Descriptor ${descriptor.uuid} on ${descriptor.characteristic.uuid} written: $descriptorWrittenResult")
+                                    Log.d(
+                                        LoggingTag,
+                                        "Descriptor ${descriptor.uuid} on ${descriptor.characteristic.uuid} written: $descriptorWrittenResult"
+                                    )
+
                                     if (!descriptorWrittenResult) {
                                         emit(
                                             DescriptorWritten(
@@ -281,7 +283,7 @@ private suspend fun <T> Mutex.queueWithTimeout(
             return@withLock withTimeout(timeMillis = timeout, block = block)
         }
     } catch (e: Exception) {
-        Timber.w(e, "Timeout on BLE call: $action")
+        Log.d(LoggingTag, "Timeout on BLE call: $action")
         throw e
     }
 }

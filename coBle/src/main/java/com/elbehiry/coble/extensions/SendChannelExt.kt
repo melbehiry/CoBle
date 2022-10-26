@@ -1,4 +1,4 @@
-package com.elbehiry.coble
+package com.elbehiry.coble.extensions
 
 import kotlinx.coroutines.channels.SendChannel
 

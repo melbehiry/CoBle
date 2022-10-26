@@ -5,13 +5,14 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
+import android.util.Log
+import com.elbehiry.coble.LoggingTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 internal class GattCallback : BluetoothGattCallback() {
 
@@ -47,7 +48,7 @@ internal class GattCallback : BluetoothGattCallback() {
     }
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-        Timber.d("onConnectionStateChange $status $newState ${stateText[newState]} ")
+        Log.d(LoggingTag,"onConnectionStateChange $status $newState ${stateText[newState]} ")
          _events.emitEvent(ConnectionStateChanged(status, newState))
     }
 
