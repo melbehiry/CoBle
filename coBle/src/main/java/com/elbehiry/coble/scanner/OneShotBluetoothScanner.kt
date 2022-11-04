@@ -1,6 +1,6 @@
 package com.elbehiry.coble.scanner
 
-import com.elbehiry.coble.ScanningTimedOut
+import com.elbehiry.coble.bluetooth.ScanningTimedOut
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -23,12 +23,13 @@ private class FirstResultBluetoothScanner(
     private val bluetoothScanner: BluetoothScanner,
     private val scanningTimeout: ScanningTimeout
 ) : OneShotBluetoothScanner {
+
     override suspend fun startScanning(scanningConfig: ScanningConfig): BluetoothScanner.Result {
         return withTimeoutOrNull(scanningTimeout.timeout) {
             bluetoothScanner.startScanning(scanningConfig)
                 .first { result ->
                     result is BluetoothScanner.Result.Error ||
-                            result is BluetoothScanner.Result.Success && result.scans.isNotEmpty()
+                            result is BluetoothScanner.Result.Success
                 }
         } ?: BluetoothScanner.Result.Error(ScanningTimedOut(scanningTimeout.timeout))
     }
