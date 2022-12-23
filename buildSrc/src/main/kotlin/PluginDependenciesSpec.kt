@@ -7,3 +7,7 @@ val PluginDependenciesSpec.`android-application`: PluginDependencySpec
 
 val PluginDependenciesSpec.`android-library`: PluginDependencySpec
     get() = id(Plugins.androidLibrary)
+
+
+val PluginDependenciesSpec.hilt: PluginDependencySpec
+    get() = id(Plugins.daggerHilt)

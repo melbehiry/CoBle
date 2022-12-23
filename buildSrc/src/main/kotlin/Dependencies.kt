@@ -8,7 +8,9 @@ object Dependencies {
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
     const val material = "com.google.android.material:material:${Versions.material}"
     const val constraintlayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintlayout}"
-
+    const val hilt = "com.google.dagger:hilt-android-gradle-plugin:${Versions.hilt}"
+    const val hiltAndroid = "com.google.dagger:hilt-android:${Versions.hilt}"
+    const val hiltCompiler = "com.google.dagger:hilt-android-compiler:${Versions.hilt}"
     object Kotlin {
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
         const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}"
